@@ -1,0 +1,32 @@
+{
+  "include": [
+    "./bin/**/*",
+    "./src/**/*",
+    "./index.ts",
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ],
+  "compilerOptions": {
+    "lib": [
+      "es5",
+      "es6",
+      "es2017",
+      "es2018",
+      "dom"
+    ],
+    "target": "es2018",
+    "module": "commonjs",
+    "allowJs": false,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": false,
+    "outDir": "./dist",
+    "strict": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+  }
+}
