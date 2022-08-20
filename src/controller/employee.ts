@@ -41,14 +41,14 @@ export class Employee {
 		return loginToken;
 	}
 
-	public static async login(Employee: any = {}): Promise<Result> {
-		if (!Employee.Email_id__c || Employee.Email_id__c === '') {
+	public static async login(employee: any = {}): Promise<Result> {
+		if (!employee.Email_id__c || employee.Email_id__c === '') {
 			return Result.error( ('Please enter your username.'), ErrorCode.missingField);
 		}
-		if (!Employee.Password__c || Employee.Password__c === '') {
+		if (!employee.Password__c || employee.Password__c === '') {
 			return Result.error( ('Please enter your Password.'), ErrorCode.missingField);
 		}
-		const verifyResult :any = await Employee.verifyEmail(Employee.Email_id__c);
+		const verifyResult :any = await Employee.verifyEmail(employee.Email_id__c);
 		if (!verifyResult.success || !verifyResult.data.length) {
 			return verifyResult;
 		}
