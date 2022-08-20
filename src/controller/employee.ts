@@ -13,29 +13,29 @@ export class Employee {
 		if (!req.body.Email_id__c || req.body.Email_id__c === '') {
 			return Result.error('Please provide the username.', ErrorCode.missingField);
 		}
-		if (!req.body.Password__c || req.body.Password__c === '') {
+		if (!req.body.User_Password__c || req.body.User_Password__c === '') {
 			return Result.error('Please provide the password.', ErrorCode.missingField);
 		}
-		const query :any = { objType: 'Account', fields: ['name', 'Id', 'Email_id__c', 'Block_Access_to_Employee_Portal__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: req.body.Email_id__c.toLowerCase(), operator: 'equals' }] } };
+		const query :any = { objType: 'Account', fields: ['name', 'Id', 'Email_id__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: req.body.Email_id__c.toLowerCase(), operator: 'equals' }] } };
 		const sfQueryResult = await Salesforce.query(query);
 		if (!sfQueryResult.success || !sfQueryResult.data.length) {
-			return Result.error('Enter the email ID provided while purchasing a Employeeship.', ErrorCode.invalidData, undefined, StatusCode.notFound);
+			return Result.error('Authentication Failed', ErrorCode.invalidData, undefined, StatusCode.notFound);
 		}
-		if (sfQueryResult.data[0].Block_Access_to_Employee_Portal__c) {
-			return Result.error('Access Denied.', ErrorCode.unauthorized, undefined , StatusCode.unauthorized);
-		}
+	
 		const record = {
 			Id: sfQueryResult.data[0].Id,
 			objType: 'Account',
-			Conference_Portal_Status__c: 'Registered'
+			Conference_Portal_Status__c: 'Registered',
+			Employee_Id__c: req.body.Employee_Id__c,
+			User_Password__c : req.body.User_Password__c
 		};
 		const recordUpdated = await Salesforce.save(record);
 		if (!recordUpdated.success) {
-			return Result.error( ('Fail to update Employee portal status to "Registered".'));
+			return Result.error(recordUpdated.message);
 		}
 		const Employee = {
 			Email_id__c: req.body.Email_id__c.toLowerCase(),
-			Password__c: req.body.Password__c
+			User_Password__c: req.body.User_Password__c
 		};
 		const loginToken: Result = await this.login(Employee);
 		return loginToken;
@@ -45,10 +45,10 @@ export class Employee {
 		if (!employee.Email_id__c || employee.Email_id__c === '') {
 			return Result.error( ('Please enter your username.'), ErrorCode.missingField);
 		}
-		if (!employee.Password__c || employee.Password__c === '') {
+		if (!employee.User_Password__c || employee.User_Password__c === '') {
 			return Result.error( ('Please enter your Password.'), ErrorCode.missingField);
 		}
-		const verifyResult :any = await Employee.verifyEmail(employee.Email_id__c);
+		const verifyResult :any = await Employee.verifyEmail(employee.Email_id__c, employee.User_Password__c);
 		if (!verifyResult.success || !verifyResult.data.length) {
 			return verifyResult;
 		}
@@ -73,18 +73,18 @@ export class Employee {
 		return result;
 	}
 
-	public static async verifyEmail(Email_id__c: string): Promise<Result> {
+	public static async verifyEmail(Email_id__c: string , User_Password__c: string): Promise<Result> {
 		let query: any;
 		if (!Email_id__c || Email_id__c === '') {
 			return Result.error('Please enter your username.', ErrorCode.missingField);
 		}
-		query = { objType: 'Account', fields: ['Id', 'Email_id__c', 'Block_Access_to_Employee_Portal__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: Email_id__c.toLowerCase(), operator: 'equals' }] } };
+		query = { objType: 'Account', fields: ['Id', 'Email_id__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: Email_id__c.toLowerCase(), operator: 'equals' }] } };
 		const sfQueryResult = await Salesforce.query(query);
 		if (!sfQueryResult.success || !sfQueryResult.data.length) {
-			return Result.error('Enter the email ID provided while purchasing a Employeeship.', ErrorCode.invalidData, undefined, StatusCode.notFound);
+			return Result.error('Authentication Failed', ErrorCode.invalidData, undefined, StatusCode.notFound);
 		}
-		if (sfQueryResult.data[0].Block_Access_to_Employee_Portal__c) {
-			return Result.error('Please call Employee Services at 1-888-567-5941.', ErrorCode.unauthorized, undefined , StatusCode.unauthorized);
+		if(sfQueryResult.data[0].User_Password__c === User_Password__c) {
+			return Result.error('Password not matched.', ErrorCode.invalidData, undefined, StatusCode.notFound);
 		}
 		const encryptToken: Result = await JWT.encrypt({ 'Email_id__c': Email_id__c.toLowerCase(), tokenExpires: true, Id: sfQueryResult.data[0].Id });
 		if (!encryptToken.success) {
