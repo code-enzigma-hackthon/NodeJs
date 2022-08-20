@@ -7,8 +7,8 @@ const enum_1 = require("../helper/enum");
 require('dotenv').config();
 class JWT {
     static encrypt(userInfo = {}) {
-        if (userInfo.username === '' || !userInfo.username) {
-            return result_1.Result.error(('JWT.encrypt:Please provide the username!'));
+        if (userInfo.Email_id__c === '' || !userInfo.Email_id__c) {
+            return result_1.Result.error('Please provide the username!.');
         }
         if (userInfo.tokenExpires) {
             const result = jwt.sign(userInfo, process.env.JWT_PRIVATEKEY, { 'expiresIn': process.env.REG_LINK_EXPIRY_TIME });
@@ -25,7 +25,7 @@ class JWT {
             return result_1.Result.success(decryptrdToken);
         }
         catch (err) {
-            return result_1.Result.error(('JWT.decrypt:Token has expired'), enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.unauthorized);
+            return result_1.Result.error('Token has expired', enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.unauthorized);
         }
     }
 }

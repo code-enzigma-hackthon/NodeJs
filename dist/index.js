@@ -18,8 +18,7 @@ require('dotenv').config();
 exports.app.use(body_parser_1.default.json());
 exports.app.get('/', (req, res) => {
     const result = {
-        name: 'api-v1-ocp ',
-        version: apiVersion.version,
+        name: 'CODE-7',
         apiStartedAt: new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }),
         host: os.hostname()
     };
@@ -36,8 +35,8 @@ class App {
         }
         const server = await exports.app.listen(process.env.PORT);
         console.log(`api-v1-ocp running on port : ${process.env.PORT}` + ' ' + new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    //     const swaggerDocument = YAML.load('./documentation.yml');
-    //     exports.app.use('/doc/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+        // const swaggerDocument = YAML.load('./documentation.yml');
+        // app.use('/doc/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     }
     static enableCORS() {
         exports.app.use(function (req, res, next) {

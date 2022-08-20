@@ -6,12 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.router = void 0;
 const express_1 = __importDefault(require("express"));
 const result_1 = require("../../controller/result");
-const Employee_1 = require("../../controller/Employee");
+const employee_1 = require("../../controller/employee");
 exports.router = express_1.default.Router();
 exports.default = exports.router;
 exports.router.post('/', async function (req, res, next) {
     try {
-        const result = await Employee_1.Employee.login(req.body);
+        const result = await employee_1.Employee.login(req.body);
         if (result && result.success) {
             result.message = ('Employee logged in successfully.');
         }
@@ -19,6 +19,6 @@ exports.router.post('/', async function (req, res, next) {
         return res.json(result);
     }
     catch (error) {
-        return res.json(result_1.Result.error((error)));
+        return res.json(result_1.Result.error(error));
     }
 });

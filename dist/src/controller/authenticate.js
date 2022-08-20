@@ -14,29 +14,19 @@ class Authenticate {
         const authHeader = request.headers['authorization'];
         const verificationToken = authHeader && authHeader.split(' ')[1];
         if (verificationToken === '' || !verificationToken) {
-            return result_1.Result.error(('Authenticate.authenticateRequest.tokenNotPresent:JWT token is required'), enum_1.ErrorCode.missingField);
+            return result_1.Result.error('JWT token is required.', enum_1.ErrorCode.missingField);
         }
         const result = await jwt_1.JWT.decrypt(verificationToken);
         if (!result.success) {
             return result;
         }
-        query = { objType: 'Account', fields: ['name', 'Id', 'JWT_Token__c', 'RecordType.Name'], criteria: { conditions: [{ fieldName: 'PersonEmail', value: result.data.username.toLowerCase(), operator: 'equals' }] } };
+        query = { objType: 'Account', fields: ['name', 'Id', 'JWT_Token__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: result.data.username.toLowerCase(), operator: 'equals' }] } };
         const sfQueryResult = await salesforce_1.default.query(query);
         if (!sfQueryResult.success || !sfQueryResult.data.length) {
-            return result_1.Result.error(('Authenticate.authenticateRequest.username:Invalid username'), enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.notFound);
+            return result_1.Result.error(('Invalid username.'), enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.notFound);
         }
-        // if (sfQueryResult.data[0].RecordType.Name === 'Inactive Employee') {
-        // 	return Result.error(('Authenticate.authenticateRequest.inactive:Employee is inactive'));
-        // }
-        // if (sfQueryResult.data[0].RecordType.Name === 'Cancelled Employee') {
-        // 	return Result.error( ('Authenticate.authenticateRequest.CancelledEmployee:Employee is Cancelled'));
-        // }
-        // if (sfQueryResult.data[0].RecordType.Name === 'Employee Prospect') {
-        // 	// tslint:disable-next-line: max-line-length
-        // 	return Result.error( ('Authenticate.authenticateRequest.EmployeeProspectNew:Only Ocean Canyon Employees may have access to the Employee Portal.'), ErrorCode.invalidData, undefined, StatusCode.notFound);
-        // }
         if (sfQueryResult.data[0].JWT_Token__c !== verificationToken) {
-            return result_1.Result.error(('Authenticate.authenticateRequest.tokenMismatched:Token not matches with request token'), enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.notFound);
+            return result_1.Result.error('Token not matches with request token.', enum_1.ErrorCode.invalidData, undefined, enum_1.StatusCode.notFound);
         }
         const context = {
             token: result.data,
