@@ -55,21 +55,24 @@ export class Employee {
 		return Result.success(verifyResult.data);
 	}
 
-	public static async getInfo(context: any = {}): Promise<Result> {
+	public static async getInfo(): Promise<Result> {
 		let query: any;
-		if (!context || !context.Id) {
-			return Result.error( ('Requird field is missing.'), ErrorCode.missingField);
-		}
+
 		query = {
-			objType: 'Account', fields: ['Id', 'Email_id__c', 'FirstName', 'LastName', 'PersonMailingState', 'PersonMailingCity', 'PersonMailingStreet', 'PersonMailingPostalCode', 'Phone', 'PersonMobilePhone'],
-			criteria: { conditions: [{ fieldName: 'Id', value: context.Id, operator: 'equals' }] }
-		};
+			objType: 'Floor__c', fields: ['Id', 'Name'],
+			innerQuerys : [
+				{
+					objType: 'Conference_rooms__r',
+					fields: ['Id', 'Status__c', 'Charges__c', 'Name', 'No_Of_Seats__c', 'Type__c']
+				},
+			]
+		}; 
 		const result = await Salesforce.query(query);
 		if (!result.success || !result.data.length) {
-			return Result.error( ('Employee not found.'), ErrorCode.invalidData, undefined, StatusCode.notFound);
+			return Result.error( ('Floor not found.'), ErrorCode.invalidData, undefined, StatusCode.notFound);
 		}
-		result.data = result.data[0];
-		result.message = ('Sucessfully retrieved Employee information.');
+		result.data = result.data;
+		result.message = ('Sucessfully retrieved Floor information.');
 		return result;
 	}
 

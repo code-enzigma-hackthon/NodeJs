@@ -18,7 +18,7 @@ export class Authenticate {
 			return result;
 		}
 
-		query = { objType: 'Account', fields: ['name', 'Id', 'JWT_Token__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: result.data.username.toLowerCase(), operator: 'equals' }] } };
+		query = { objType: 'Account', fields: ['name', 'Id', 'JWT_Token__c'], criteria: { conditions: [{ fieldName: 'Email_id__c', value: result.data.Email_id__c.toLowerCase(), operator: 'equals' }] } };
 		const sfQueryResult = await Salesforce.query(query);
 		if (!sfQueryResult.success || !sfQueryResult.data.length) {
 			return Result.error(('Invalid username.' ), ErrorCode.invalidData, undefined, StatusCode.notFound);
@@ -27,7 +27,7 @@ export class Authenticate {
 			return Result.error('Token not matches with request token.', ErrorCode.invalidData, undefined, StatusCode.notFound);
 		}
 		const context = {
-			token: result.data,
+			token: sfQueryResult.data[0].JWT_Token__c,
 			Id: sfQueryResult.data[0].Id,
 			objType: sfQueryResult.data[0].objType
 		};
