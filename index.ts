@@ -39,9 +39,7 @@ class App {
 		}
 
 		const server: any = await app.listen(process.env.PORT);
-		console.log(`api-v1-ocp running on port : ${process.env.PORT}` + ' ' + new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-		// const swaggerDocument = YAML.load('./documentation.yml');
-		// app.use('/doc/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+		console.log(`api-v1-code7 running on port : ${process.env.PORT}` + ' ' + new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
 	}
 
 	public static enableCORS() {	
